@@ -1,6 +1,7 @@
 var restify = require('restify');
 var builder = require('botbuilder');
 var api = require('yolapi');
+var metaIntent = require('./metaIntent');
 
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -88,7 +89,32 @@ function yolandaResponse(session, answer, cb){
     });
 }
 
-bot.dialog('/', [
+bot.dialog('/', function (session) {
+
+    if (session.message.type === 'message') {
+        var text = session.message.text;
+
+        metaIntent.process(text, function(err, result) {
+            if (!result) {
+
+                session.send('Sorry, I didn\'t understand that.');
+
+            } else if (result.qnaResponse) {
+
+                session.send(result.qnaResponse);
+
+            } else if (result.intent === 'AccountComparison') {
+
+                session.replaceDialog('/prestart');
+
+            }
+        });
+    }
+});
+
+
+
+bot.dialog('/prestart', [
     function (session, args, next) {
         if (!session.privateConversationData.yolandaSession) {
             session.beginDialog('/start');
@@ -182,6 +208,6 @@ function sendRBResult(session, rbResult) {
 }
 
 function getEvidenceTreeLink (factId){
-    return '[Evidence Tree](https://app.rainbird.ai/components/rainbird-analysis-ui/whyAnalysis.html?id=' + factId +
+    return '[(?)](https://app.rainbird.ai/components/rainbird-analysis-ui/whyAnalysis.html?id=' + factId +
         '?api=https://api.rainbird.ai)';
 }
