@@ -13,43 +13,18 @@ var connector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
+//connector.onInvoke(function (event ){
+//    console.log('Connector invoked!' + event);
+//});
+
 var bot = new builder.UniversalBot(connector);
-//bot.set('persistConversationData', true);
 
-//Speaks map locally
-//var yolandaSession = new api.session('http://127.0.0.1:3003',
-//    'eb09d81c-88de-4dae-93fe-b5be5c418465',
-//    '7a60433a-6a4d-4ea8-97e1-7d67c22ba42d'
-//);
-
-//Hamilton staging
-//var yolandaSession = new api.session('https://staging-api.rainbird.ai',
-//    'be632a88-033f-482c-9ff7-66ea6d94db07',
-//    '2d875e8c-621d-419e-b414-48ca11834784'
-//);
-
-
-
-//Hamilton local
-//var yolandaSession = new api.session('http://127.0.0.1:3003',
-//    'eb09d81c-88de-4dae-93fe-b5be5c418465',
-//    'f1055530-7329-40b8-88fd-c44d47c2db5d'
-//);
-
-
-//Hamilton Azure
-//var yolandaSession = new api.session('http://127.0.0.1:3003',
-//    'eb09d81c-88de-4dae-93fe-b5be5c418465',
-//    'f1055530-7329-40b8-88fd-c44d47c2db5d'
-//);
-
-//Hamilton App
+//Hamilton in App
 var yolandaSession = new api.session('https://api.rainbird.ai',
     'e162861e-3fb6-4046-b822-7b6277c9df72',
     '05a6f605-ac0e-4124-b169-15763398be41'
 );
 
-//var yolandaQuery = { subject: 'Will', relationship: 'speaks', object: null };
 var yolandaQuery = { subject: 'the customer', relationship: 'recommended', object: null };
 
 server.post('/api/messages', connector.listen());
@@ -65,7 +40,6 @@ function startYolandaSession(cb){
                 return cb('Error running query..' + err);
             }
 
-            console.log('In start yolanda session');
             cb (null, response);
         });
     });
@@ -89,62 +63,49 @@ function yolandaResponse(session, answer, cb){
     });
 }
 
-bot.dialog('/', function (session) {
+bot.dialog('/',
+    function (session) {
+        if (session.message.type === 'message') {
+            var text = session.message.text;
+            session.sendTyping();
+            metaIntent.process(text, function(err, result) {
+                if (!result) {
+                    session.send('Sorry, I didn\'t understand that.  How can I help you?');
+                } else if (result.qnaResponse) {
+                    session.send(result.qnaResponse);
+                } else if (result.intent === 'AccountComparison') {
+                    session.replaceDialog('/prestart');
+                }
+            });
+        }
+    }
+);
 
-    if (session.message.type === 'message') {
-        var text = session.message.text;
-
-        metaIntent.process(text, function(err, result) {
-            if (!result) {
-
-                session.send('Sorry, I didn\'t understand that.');
-
-            } else if (result.qnaResponse) {
-
-                session.send(result.qnaResponse);
-
-            } else if (result.intent === 'AccountComparison') {
-
-                session.replaceDialog('/prestart');
-
-            }
-        });
+bot.dialog('/prestart', function (session, args, next) {
+    if (!session.privateConversationData.yolandaSession) {
+        session.replaceDialog('/start');
+    } else {
+        session.replaceDialog('/rbloop');
     }
 });
 
-
-
-bot.dialog('/prestart', [
-    function (session, args, next) {
-        if (!session.privateConversationData.yolandaSession) {
-            session.beginDialog('/start');
-        } else {
-            session.beginDialog('/rbloop');
-            //next();
+bot.dialog('/start', function (session) {
+    session.sendTyping();
+    startYolandaSession(function (err, response) {
+        if (err) {
+            return session.send('Sorry there has been a problem starting a Rainbird session.');
         }
-    }
-]);
 
-bot.dialog('/start', [
-    function (session) {
-        startYolandaSession(function (err, response) {
-            if (err) {
-                return session.send('Sorry there has been a problem.');
-            }
-
-            session.privateConversationData.yolandaSession = yolandaSession.id;
-            session.privateConversationData.yolandaResponse = response;
-            session.beginDialog('/rbloop');
-        });
-    }
-]);
+        session.privateConversationData.yolandaSession = yolandaSession.id;
+        session.privateConversationData.yolandaResponse = response;
+        session.replaceDialog('/rbloop');
+    });
+});
 
 
 bot.dialog('/rbloop', [
     function (session) {
-        if (!session.privateConversationData.yolandaResponse) {
-            session.beginDialog('/');
-        } else if (session.privateConversationData.yolandaResponse.question){
+        if (session.privateConversationData.yolandaResponse.question){
             sendRBQuestion(session, session.privateConversationData.yolandaResponse.question);
         } else {
             sendRBResult(session, session.privateConversationData.yolandaResponse.result);
@@ -160,26 +121,25 @@ bot.dialog('/rbloop', [
             userAnswer = results.response.entity;
         }
 
+        session.sendTyping();
         yolandaResponse(session, userAnswer, function (err, response){
             session.privateConversationData.yolandaResponse = response;
-
-            if (!session.privateConversationData.yolandaResponse){
-                session.beginDialog('/');
-            } else if (session.privateConversationData.yolandaResponse.question){
-                session.beginDialog('/rbloop');
+            if (session.privateConversationData.yolandaResponse.question){
+                session.replaceDialog('/rbloop');
             } else {
                 sendRBResult(session, session.privateConversationData.yolandaResponse.result);
                 delete session.privateConversationData.yolandaSession;
                 session.endDialog();
             }
-
         });
     }
-]);
-
-function prepareResponse(response){
-    return response.question ? response.question.prompt : JSON.stringify(response.result);
-}
+]).cancelAction('restart', 'No problem, how else can I help you?', {
+    matches: /restart/i,
+    onSelectAction: function (session, args, next){
+        delete session.privateConversationData.yolandaSession;
+        next();
+    }
+});
 
 function sendRBQuestion(session, rbQuestion) {
     if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
