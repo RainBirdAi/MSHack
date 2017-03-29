@@ -151,6 +151,16 @@ bot.on('conversationUpdate', function (message) {
     }
 });
 
+bot.on('contactRelationUpdate', function (message) {
+    if (message.action === 'add') {
+        var name = message.user ? message.user.name : null;
+        var reply = new builder.Message()
+            .address(message.address)
+            .text("Hello %s.  Thanks for adding me, how can I help you?", name || 'there');
+        bot.send(reply);
+    }
+});
+
 bot.dialog('/welcome', function (session) {
     session.send('Welcome, how can I help you?');
     session.endDialog();
