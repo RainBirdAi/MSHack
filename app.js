@@ -141,6 +141,21 @@ bot.dialog('/rbloop', [
     }
 });
 
+bot.on('conversationUpdate', function (message) {
+    if (message.membersAdded) {
+        message.membersAdded.forEach(function (identity) {
+            if (identity.id === message.address.bot.id) {
+                bot.beginDialog(message.address, '/welcome');
+            }
+        });
+    }
+});
+
+bot.dialog('/welcome', function (session) {
+    session.send('Welcome, how can I help you?');
+    session.endDialog();
+});
+
 function sendRBQuestion(session, rbQuestion) {
     if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
         var choices = rbQuestion.concepts.map(function(item) {return item.name});
