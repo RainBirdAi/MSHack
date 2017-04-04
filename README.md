@@ -65,14 +65,16 @@ At this point the bot was registered on the bot framework website, with a Micros
 The following environment variables were added to the Azure instance in order to start the first deployment following
 a git push to the remote repository on the Azure instance:
 
-* MICROSOFT_APP_ID				Created during Bot registration at https://dev.botframework.com/bots/new
-* MICROSOFT_APP_PASSWORD		"
-* RAINBIRD_EVIDENCE_TREE_HOST 	Rainbird host used to in Evidence Tree links
-* RAINBIRD_API_URL 				Rainbird API URL
-* RAINBIRD_API_KEY				Rainbird API key
-* RAINBIRD_KMID					Rainbird knowledge map ID
-* RAINBIRD_QUERY_SUBJECT		Subject value of Rainbird query
-* RAINBIRD_QUERY_RELATIONSHIP	Relationship used in the Rainbird query
+| Variable Name | Description |
+| --- | --- |
+| MICROSOFT_APP_ID | Created during Bot registration at https://dev.botframework.com/bots/new | 
+| MICROSOFT_APP_PASSWORD | " |
+| RAINBIRD_EVIDENCE_TREE_HOST | Rainbird host used to in Evidence Tree links | 
+| RAINBIRD_API_URL | Rainbird API URL | 
+| RAINBIRD_API_KEY | Rainbird API key |
+| RAINBIRD_KMID | Rainbird knowledge map ID |
+| RAINBIRD_QUERY_SUBJECT | Subject value of Rainbird query |
+| RAINBIRD_QUERY_RELATIONSHIP | Relationship used in the Rainbird query |
 
 ### Connecting the Bot to the various channels
  
