@@ -13,19 +13,15 @@ var connector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
-//connector.onInvoke(function (event ){
-//    console.log('Connector invoked!' + event);
-//});
-
 var bot = new builder.UniversalBot(connector);
 
-//Hamilton in App
-var yolandaSession = new api.session('https://api.rainbird.ai',
-    'e162861e-3fb6-4046-b822-7b6277c9df72',
-    '05a6f605-ac0e-4124-b169-15763398be41'
+var yolandaSession = new api.session(process.env.RAINBIRD_API_URL,
+    process.env.RAINBIRD_API_KEY,
+    process.env.RAINBIRD_KMID
 );
 
-var yolandaQuery = { subject: 'the customer', relationship: 'recommended', object: null };
+var yolandaQuery = { subject: process.env.RAINBIRD_QUERY_SUBJECT, relationship: process.env.RAINBIRD_QUERY_RELATIONSHIP,
+    object: null };
 
 server.post('/api/messages', connector.listen());
 
@@ -63,23 +59,21 @@ function yolandaResponse(session, answer, cb){
     });
 }
 
-bot.dialog('/',
-    function (session) {
-        if (session.message.type === 'message') {
-            var text = session.message.text;
-            session.sendTyping();
-            metaIntent.process(text, function(err, result) {
-                if (!result) {
-                    session.send('Sorry, I didn\'t understand that.  How can I help you?');
-                } else if (result.qnaResponse) {
-                    session.send(result.qnaResponse);
-                } else if (result.intent === 'AccountComparison') {
-                    session.replaceDialog('/prestart');
-                }
-            });
-        }
+bot.dialog('/', function (session) {
+    if (session.message.type === 'message') {
+        var text = session.message.text;
+        session.sendTyping();
+        metaIntent.process(text, function(err, result) {
+            if (!result) {
+                session.send('Sorry, I didn\'t understand that.  How can I help you?');
+            } else if (result.qnaResponse) {
+                session.send(result.qnaResponse);
+            } else if (result.intent === 'AccountComparison') {
+                session.replaceDialog('/prestart');
+            }
+        });
     }
-);
+});
 
 bot.dialog('/prestart', function (session, args, next) {
     if (!session.privateConversationData.yolandaSession) {
@@ -101,7 +95,6 @@ bot.dialog('/start', function (session) {
         session.replaceDialog('/rbloop');
     });
 });
-
 
 bot.dialog('/rbloop', [
     function (session) {
@@ -141,6 +134,7 @@ bot.dialog('/rbloop', [
     }
 });
 
+//Event used to send a welcome message (works with the emulator)
 bot.on('conversationUpdate', function (message) {
     if (message.membersAdded) {
         message.membersAdded.forEach(function (identity) {
@@ -151,6 +145,7 @@ bot.on('conversationUpdate', function (message) {
     }
 });
 
+//Skype event used to send a welcome message
 bot.on('contactRelationUpdate', function (message) {
     if (message.action === 'add') {
         var name = message.user ? message.user.name : null;
@@ -169,13 +164,11 @@ bot.dialog('/welcome', function (session) {
 function sendRBQuestion(session, rbQuestion) {
     if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
         var choices = rbQuestion.concepts.map(function(item) {return item.name});
-        var styleCode =  builder.ListStyle['button'];
-        var config = {'listStyle': styleCode, 'width': '100%'};
-        builder.Prompts.choice(session, rbQuestion.prompt, choices, config);
+        builder.Prompts.choice(session, rbQuestion.prompt, choices, { 'listStyle': builder.ListStyle['button'] });
     } else if (rbQuestion.dataType === 'number') {
         builder.Prompts.number(session, rbQuestion.prompt);
-    } else {
-        throw new Error('Didn\'t know how to ask question!');
+    } else if (rbQuestion.dataType === 'date') {
+        builder.Prompts.time(session, rbQuestion.prompt);
     }
 }
 
@@ -193,6 +186,6 @@ function sendRBResult(session, rbResult) {
 }
 
 function getEvidenceTreeLink (factId){
-    return '[(?)](https://app.rainbird.ai/components/rainbird-analysis-ui/whyAnalysis.html?id=' + factId +
-        '?api=https://api.rainbird.ai)';
+    return '[(?)](' + process.env.RAINBIRD_EVIDENCE_TREE_HOST + '/components/rainbird-analysis-ui/whyAnalysis.html?' +
+        'id=' + factId + '?api=' + process.env.RAINBIRD_API_URL + ')';
 }

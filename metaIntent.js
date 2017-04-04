@@ -1,4 +1,3 @@
-// metaIntent.js
 var superagent = require('superagent');
 var querystring = require('querystring');
 
