@@ -36,8 +36,9 @@ The key implementation point between the bot framework and Rainbird was a waterf
 Step 1 - Translate the Rainbird question into the correct built-in prompt. We packaged up this translation, which was 
 as simple as:
 
-```function sendRBQuestion(session, rbQuestion) {
-    if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
+```
+function sendRBQuestion(session, rbQuestion) {
+   if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
        var choices = rbQuestion.concepts.map(function(item) {return item.name});
        builder.Prompts.choice(session, rbQuestion.prompt, choices, {'listStyle': buttonList});
    } else if (rbQuestion.dataType === 'number') {
