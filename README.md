@@ -45,7 +45,8 @@ as simple as:
    } else if (rbQuestion.dataType === 'date') {
        builder.Prompts.time(session, rbQuestion.prompt);
    }
-}```
+}
+```
 
 Step 2 - Take the user’s response to the prompt, package it up as a Rainbird answer and call /respond.
 
