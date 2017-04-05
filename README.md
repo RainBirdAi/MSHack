@@ -36,7 +36,7 @@ The key implementation point between the bot framework and Rainbird was a waterf
 Step 1 - Translate the Rainbird question into the correct built-in prompt. We packaged up this translation, which was 
 as simple as:
 
-function sendRBQuestion(session, rbQuestion) {
+```function sendRBQuestion(session, rbQuestion) {
     if (rbQuestion.concepts && rbQuestion.concepts.length > 0) {
        var choices = rbQuestion.concepts.map(function(item) {return item.name});
        builder.Prompts.choice(session, rbQuestion.prompt, choices, {'listStyle': buttonList});
@@ -45,7 +45,7 @@ function sendRBQuestion(session, rbQuestion) {
    } else if (rbQuestion.dataType === 'date') {
        builder.Prompts.time(session, rbQuestion.prompt);
    }
-}
+}```
 
 Step 2 - Take the user’s response to the prompt, package it up as a Rainbird answer and call /respond.
 
