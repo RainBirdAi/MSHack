@@ -1,0 +1,25 @@
+{
+  "name": "MSHack",
+  "version": "1.0.0",
+  "description": "A Rainbird chatbot created during a Hack-a-thon with Microsoft",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "homepage": "https://github.com/RainBirdAi/MSHack",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:RainBirdAi/MSHack.git"
+  },
+  "bugs": {
+    "url": "https://github.com/RainBirdAi/MSHack/issues"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "botbuilder": "3.7.x",
+    "querystring": "0.2.x",
+    "restify": "4.3.x",
+    "superagent": "3.5.x",
+    "yolapi": "0.3.x"
+  }
+}
