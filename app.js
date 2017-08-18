@@ -186,6 +186,6 @@ function sendRBResult(session, rbResult) {
 }
 
 function getEvidenceTreeLink (factId){
-    return '[(?)](' + process.env.RAINBIRD_EVIDENCE_TREE_HOST + '/components/rainbird-analysis-ui/whyAnalysis.html?' +
+    return '[(?)](' + process.env.RAINBIRD_EVIDENCE_TREE_HOST + '/applications/components/rainbird-analysis-ui/whyAnalysis.html?' +
         'id=' + factId + '?api=' + process.env.RAINBIRD_API_URL + ')';
 }
