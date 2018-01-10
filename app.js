@@ -2,6 +2,7 @@ var restify = require('restify');
 var builder = require('botbuilder');
 var api = require('yolapi');
 var metaIntent = require('./metaIntent');
+var azure = require('botbuilder-azure');
 
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -13,7 +14,17 @@ var connector = new builder.ChatConnector({
     appPassword: process.env.MICROSOFT_APP_PASSWORD
 });
 
+var documentDbOptions = {
+    host: process.env.COSMOS_DB_HOST,
+    masterKey: process.env.COSMOS_DB_KEY,
+    database: 'botdocs',
+    collection: 'botdata'
+};
+var docDbClient = new azure.DocumentDbClient(documentDbOptions);
+var cosmosStorage = new azure.AzureBotStorage({ gzipData: false }, docDbClient);
+
 var bot = new builder.UniversalBot(connector);
+bot.set('storage', cosmosStorage);
 
 var yolandaSession = new api.session(process.env.RAINBIRD_API_URL,
     process.env.RAINBIRD_API_KEY,
