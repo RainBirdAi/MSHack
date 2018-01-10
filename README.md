@@ -77,6 +77,12 @@ a git push to the remote repository on the Azure instance:
 | RAINBIRD_KMID | Rainbird knowledge map ID |
 | RAINBIRD_QUERY_SUBJECT | Subject value of Rainbird query |
 | RAINBIRD_QUERY_RELATIONSHIP | Relationship used in the Rainbird query |
+| COSMOS_DB_HOST | Used for conversation storage, details in Azure |
+| COSMOS_DB_KEY | Used for conversation storage, details in Azure |
+| LUIS_APP_ID | --- |
+| LUIS_APP_KEY | --- |
+| QNA_APP_ID | --- |
+| QNA_APP_KEY | --- |
 
 ### Connecting the Bot to the various channels
  

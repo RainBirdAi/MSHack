@@ -1,6 +1,6 @@
 {
   "name": "MSHack",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A Rainbird chatbot created during a Hack-a-thon with Microsoft",
   "main": "app.js",
   "scripts": {
@@ -17,6 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "botbuilder": "3.7.x",
+    "botbuilder-azure": "3.0.x",
     "querystring": "0.2.x",
     "restify": "4.3.x",
     "superagent": "3.5.x",
