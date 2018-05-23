@@ -188,11 +188,10 @@ function sendRBResult(session, rbResult) {
         var message = '';
         rbResult.forEach(function(result) {
             message += result.subject + ' ' +result.relationship + ' ' + result.object + ' \t' +
-                getEvidenceTreeLink(result.factID) + '\n';
+                getEvidenceTreeLink(result.factID) + '\n\n';
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
                message += `${metadata.data}\n`;
             });
-            message += '\n';
         });
         session.send(message);
     } else {
