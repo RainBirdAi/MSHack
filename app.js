@@ -187,7 +187,7 @@ function sendRBResult(session, rbResult) {
     if (rbResult && rbResult.length > 0) {
         var message = '';
         rbResult.forEach(function(result) {
-            message += result.subject + ' ' +result.relationship + ' ' + result.object + ' \t' +
+            message += result.object + ' \t' +
                 getEvidenceTreeLink(result.factID) + '\n\n';
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
                message += `${metadata.data}\n`;
