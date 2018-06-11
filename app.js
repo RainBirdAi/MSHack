@@ -187,11 +187,12 @@ function sendRBResult(session, rbResult) {
     if (rbResult && rbResult.length > 0) {
         var message = '';
         rbResult.forEach(function(result) {
-            message += result.object + ' \t' +
+            message += result.object + ' ' + result.certainty + '% \t' +
                 getEvidenceTreeLink(result.factID) + '\n\n';
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
                message += `${metadata.data}\n`;
             });
+            message += '\n';
         });
         session.send(message);
     } else {
