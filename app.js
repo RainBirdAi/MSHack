@@ -192,7 +192,7 @@ function sendRBResult(session, rbResult) {
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
                message += `${metadata.data}  \n`;
             });
-            message += '  \n\n';
+            message += '  \n  \n';
         });
         session.send(message);
     } else {
