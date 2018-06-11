@@ -185,18 +185,18 @@ function sendRBQuestion(session, rbQuestion) {
 
 function sendRBResult(session, rbResult) {
     if (rbResult && rbResult.length > 0) {
-        var message = 'Thank you for your time, I have found the following accounts to be the most suitable for you:\n\n';
+        var message = 'Thank you for your time, we have found the following accounts to be the most suitable for you:\n\n';
         rbResult.forEach(function(result) {
             message += result.object + ' ' + result.certainty + '% \t' +
                 getEvidenceTreeLink(result.factID) + '\n\n';
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
                message += `${metadata.data}  \n`;
             });
-            message += '  \n  \n';
+            message += '<br />';
         });
         session.send(message);
     } else {
-        session.send('Could not find any answers.');
+        session.send('Thank you for your time, but we could not find any accounts that are suitable for you.');
     }
 }
 
