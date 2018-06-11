@@ -185,14 +185,14 @@ function sendRBQuestion(session, rbQuestion) {
 
 function sendRBResult(session, rbResult) {
     if (rbResult && rbResult.length > 0) {
-        var message = '';
+        var message = 'Thank you for your time, I have found the following accounts to be the most suitable for you:\n';
         rbResult.forEach(function(result) {
             message += result.object + ' ' + result.certainty + '% \t' +
                 getEvidenceTreeLink(result.factID) + '\n\n';
             result.objectMetadata.en && result.objectMetadata.en.map((metadata) => {
-               message += `${metadata.data}\n`;
+               message += `${metadata.data}  \n`;
             });
-            message += '\n';
+            message += '  \n';
         });
         session.send(message);
     } else {
